@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
+
+// importing our product schema from the models folder
+const Product = require('../models/products');
 
 router.get('/', (req, res, next) => {
     res.status(200).json({
@@ -8,10 +12,20 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    const product = {
+
+    // create new instance - use the Product model as a constructor
+    const product = new Product({
+        _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         price: req.body.price
-    };
+    });
+    // use mongoose function 'save()' and chain 'exec' method
+    // exec will turn this into a promise (nvm using .then) 
+    product.save().then(result => {
+        console.log(result);
+    }).catch(err => console.log(err));
+
+
     res.status(200).json({
         message: 'Handling POST requests to /products',
         createdProduct: product

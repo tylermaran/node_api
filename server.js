@@ -1,6 +1,6 @@
 const http = require('http');
 const app = require('./app');
-// apparently this is old syntax for js, but still current for node
+// apparently require('...') is old syntax for js, but still required for node
 
 const port = process.env.PORT || 3000;
 
