@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 // setup mongoose - will run the MongoDB client as well as schemas and validation
 const mongoose = require('mongoose');
 
-
 // importing routes - add a new const for each of our routes
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
@@ -16,18 +15,11 @@ const orderRoutes = require('./api/routes/orders');
 // You also need to change out the password here for your database password
 // to do this properly, create a process.env file
 // url... + process.env.MONGO_PASSWORD + ...url
-mongoose.connect('mongodb+srv://tylermaran:<2lYNf6a4YR7oXYeT>@node-api-app-k8f4b.mongodb.net/test?retryWrites=true', {
-    useNewUrlParser: true
-});
-
-
-// console.log(process.env.MONGO_PW);
-// mongoose.connect('mongodb+srv://tylermaran:<' +
-//     process.env.MONGO_PW +
-//     '>@node-api-app-k8f4b.mongodb.net/test?retryWrites=true', {
-//         useNewUrlParser: true
-//     });
-
+mongoose.connect('mongodb://testing:' +
+    process.env.MONGO_PW +
+    '@node-api-app-shard-00-00-k8f4b.mongodb.net:27017,node-api-app-shard-00-01-k8f4b.mongodb.net:27017,node-api-app-shard-00-02-k8f4b.mongodb.net:27017/test?ssl=true&replicaSet=node-api-app-shard-0&authSource=admin&retryWrites=true', {
+        useNewUrlParser: true
+    });
 
 // running morgan in dev mode
 app.use(morgan('dev'));

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// make sure to use the mongoose.Schema.whatever when designating the schema
 const productSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name: String,
