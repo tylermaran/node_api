@@ -8,10 +8,25 @@ const Product = require('../models/products');
 router.get('/', (req, res, next) => {
     // find, with no input, will find all data
     Product.find()
+        .select('name price _id') // you can select which fields you want to include
         .exec()
         .then(docs => {
-            console.log(docs);
-            res.status(200).json(docs);
+            // sending additional information back to the user
+            const response = {
+                count: docs.length,
+                products: docs.map(doc => {
+                    return {
+                        name: doc.name,
+                        price: doc.price,
+                        _id: doc._id,
+                        request: {
+                            type: 'GET',
+                            url: 'http://localhost:3000/products/' + doc._id // adding a url
+                        }
+                    }
+                })
+            };
+            res.status(200).json(response);
         })
         .catch(err => {
             console.log(err);
@@ -32,8 +47,16 @@ router.post('/', (req, res, next) => {
     product.save().then(result => {
         console.log(result);
         res.status(200).json({
-            message: 'Handling POST requests to /products',
-            createdProduct: product
+            message: 'Created product successfully',
+            createdProduct: {
+                name: result.name,
+                price: result.price,
+                _id: result._id,
+                request: {
+                    type: 'GET',
+                    url: 'http://localhost:3000/products/' + result._id // adding a url
+                }
+            }
         });
     }).catch(err => {
         console.log(err);
@@ -68,21 +91,25 @@ router.patch('/:productId', (req, res, next) => {
     const id = req.params.productId;
     console.log(id);
     const updateOps = {};
-    for (const ops of req.body){
+    for (const ops of req.body) {
         updateOps[ops.propName] = ops.value;
     }
-    Product.findByIdAndUpdate({ _id: id }, { $set: updateOps})
-    .exec()
-    .then(results => {
-        console.log(results);
-        res.status(200).json(results);
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({
-            error: err
+    Product.findByIdAndUpdate({
+            _id: id
+        }, {
+            $set: updateOps
         })
-    });
+        .exec()
+        .then(results => {
+            console.log(results);
+            res.status(200).json(results);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            })
+        });
 });
 
 // Delete route
