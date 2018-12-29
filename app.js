@@ -24,6 +24,9 @@ mongoose.connect('mongodb://testing:' +
 // running morgan in dev mode
 app.use(morgan('dev'));
 
+// making a folder publically available
+app.use('/uploads', express.static('uploads'));
+
 // running bodyparser - apparently no longer necessary in newer version of Express
 app.use(bodyParser.urlencoded({
     extended: false
