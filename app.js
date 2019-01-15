@@ -6,10 +6,12 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 // setup mongoose - will run the MongoDB client as well as schemas and validation
 const mongoose = require('mongoose');
+mongoose.set('useCreateIndex', true);
 
 // importing routes - add a new const for each of our routes
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+const userRoutes = require('./api/routes/user');
 
 // connect to mongoose and you need to pass a path
 // You also need to change out the password here for your database password
@@ -52,6 +54,7 @@ app.use((res, req, next) => {
 // an incoming request has to go through app.use and to whatever we pass to it
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/user', userRoutes);
 
 // Error handling: if you reach this line, it is because the request did not meet any of the 
 // previous routes (/products, /orders, etc.)
