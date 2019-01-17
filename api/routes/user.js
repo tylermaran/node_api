@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 // Import the User model
 const User = require('../models/user');
@@ -58,19 +59,74 @@ router.post('/signup', (req, res, next) => {
         });
 });
 
+// Login route
+router.post('/login', (req, res, next) => {
+    User.findOne({
+            email: req.body.email
+        })
+        .exec()
+        .then(user => {
+            if (user.length < 1) {
+                res.status(401).json({
+                    message: 'Auth Failed'
+                });
+            } else {
+                // user will be returned as type array - but only a single user (FindOne)
+                console.log(user);
+                bcrypt.compare(req.body.password, user.password, (err, result) => {
+                    if (err) {
+                        res.status(401).json({
+                            message: 'Auth Failed'
+                        });
+                    }
+                    if (result) {
+                        // result === true if a match
+                        // Generate the web token
+                        console.log(user);
+                        const token = jwt.sign({
+                            email: user.email,
+                            userId: user._id
+                        }, process.env.JWT_KEY, {
+                            expiresIn: '1h'
+                        });
+                        res.status(200).json({
+                            message: 'Auth Successful',
+                            token: token
+                        });
+
+                    } else {
+                        res.status(401).json({
+                            message: 'Auth Failed'
+                        });
+                    }
+                });
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+});
+
+
+// Delete users
 router.delete('/:userId', (req, res, next) => {
-    User.remove({ _id: req.params.userId})
-    .exec()
-    .then( result => {
-        res.status(200).json({
-            message: 'User Deleted'
+    User.remove({
+            _id: req.params.userId
+        })
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                message: 'User Deleted'
+            });
+        })
+        .catch(err => {
+            res.status(404).json({
+                error: err
+            });
         });
-    })
-    .catch( err => {
-        res.status(404).json({
-            error: err
-        });
-    });
 });
 
 module.exports = router;

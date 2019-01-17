@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-
+// requiring our authorization check middleware
+const checkAuth = require('../middleware/check-auth');
 
 // Requiring multer and initializing it 
 const multer = require('multer');
@@ -37,6 +38,7 @@ const upload = multer({
 // importing our product schema from the models folder
 const Product = require('../models/products');
 
+// no authorization needed on the get all request 
 router.get('/', (req, res, next) => {
     // find, with no input, will find all data
     Product.find()
@@ -69,8 +71,8 @@ router.get('/', (req, res, next) => {
         });
 });
 
-// POST - Creating a new item
-router.post('/', upload.single('productImage'), (req, res, next) => {
+// POST - Creating a new item (required checkauth)
+router.post('/', checkAuth, upload.single('productImage'), (req, res, next) => {
     // using the multer middleware we have the req.file option
     console.log(req.file);
         // with this req.file, you get a lot of data - including the file.path
@@ -105,7 +107,7 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
     });
 });
 
-// GET - individual id
+// GET - individual id (no authorization required)
 router.get('/:productId', (req, res, next) => {
     const id = req.params.productId;
     Product.findById(id).exec().then(doc => {
@@ -125,8 +127,8 @@ router.get('/:productId', (req, res, next) => {
     });
 });
 
-// Patch route
-router.patch('/:productId', (req, res, next) => {
+// Patch route (requires checkAuth)
+router.patch('/:productId', checkAuth, (req, res, next) => {
     const id = req.params.productId;
     console.log(id);
     const updateOps = {};
@@ -151,8 +153,8 @@ router.patch('/:productId', (req, res, next) => {
         });
 });
 
-// Delete route
-router.delete('/:productId', (req, res, next) => {
+// Delete route (requires checkAuth)
+router.delete('/:productId', checkAuth, (req, res, next) => {
     const id = req.params.productId;
     Product.remove({
             _id: id

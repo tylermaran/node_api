@@ -5,7 +5,9 @@ const mongoose = require('mongoose');
 const Order = require('../models/order');
 const Product = require('../models/products');
 
-// GET request
+const checkAuth = require('../middleware/check-auth');
+
+// GET request (no checkauth required)
 router.get('/', (req, res, next) => {
     Order.find().select('-__v')
         .populate('product', 'name')
@@ -36,8 +38,8 @@ router.get('/', (req, res, next) => {
         });
 });
 
-// POST request
-router.post('/', (req, res, next) => {
+// POST request (requires checkauth)
+router.post('/', checkAuth, (req, res, next) => {
     // making sure we can't create orders for products we don't have
     Product.findById(req.body.productId)
         .then(product => {
@@ -77,7 +79,7 @@ router.post('/', (req, res, next) => {
         })
 });
 
-// Get Individual item
+// Get Individual item (no checkauth required)
 router.get('/:orderId', (req, res, next) => {
     Order.findById(req.params.orderId)
         .populate('product')
@@ -105,8 +107,8 @@ router.get('/:orderId', (req, res, next) => {
         });
 });
 
-// Delete Individual Item
-router.delete('/:orderId', (req, res, next) => {
+// Delete Individual Item (requires checkAuth)
+router.delete('/:orderId', checkAuth, (req, res, next) => {
     Order.remove({
             _id: req.params.orderId
         })
