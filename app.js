@@ -8,6 +8,15 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
 
+const cors = require('cors');
+
+var corsOptions = {
+    origin: 'http://localhost:4000',
+    credentials: true,
+}
+
+app.use(cors(corsOptions));
+
 // importing routes - add a new const for each of our routes
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
@@ -39,19 +48,19 @@ app.use(bodyParser.json());
 // the '*' will give all access
 // you could do 'https://www.clubfinder.com - and only that page would have access
 // PUT, POST, PATCH, DELETE, GET are all the allowed methods
-app.use((res, req, next) => {
-    res.header('Access-Control-Alllow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', '*');
+// app.use((res, req, next) => {
+//     console.log('Gets to the middleware');
+//     res.header('Access-Control-Allow-Origin', '*');
+//     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
-    if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-        res.status(200).json({});
-    }
-    next();
-});
+//     if (req.method === 'OPTIONS') {
+//         console.log('req.method = options');
+//         res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+//         res.status(200).json({});
+//     }
+//     next();
+// });
 
-// use, as a method, sets up a middleware
-// an incoming request has to go through app.use and to whatever we pass to it
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/user', userRoutes);
